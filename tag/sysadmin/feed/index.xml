@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	
+	xmlns:georss="http://www.georss.org/georss"
+	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	>
+
+<channel>
+	<title>sysadmin &#8211; th3-m0th</title>
+	<atom:link href="./index.html" rel="self" type="application/rss+xml" />
+	<link>./../../../index.html</link>
+	<description>Un blog sobre ciberseguridad y desarrollo de software.</description>
+	<lastBuildDate>Wed, 22 Feb 2023 12:19:58 +0000</lastBuildDate>
+	<language>es</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.2</generator>
+<site xmlns="com-wordpress:feed-additions:1">215802445</site>	<item>
+		<title>IPTABLES para novatos</title>
+		<link>./../../../iptables-para-novatos/index.html</link>
+					<comments>./../../../iptables-para-novatos/index.html#comments</comments>
+		
+		<dc:creator><![CDATA[th3-m0th]]></dc:creator>
+		<pubDate>Thu, 16 Feb 2023 09:18:29 +0000</pubDate>
+				<category><![CDATA[Linux]]></category>
+		<category><![CDATA[Blue Team]]></category>
+		<category><![CDATA[cli]]></category>
+		<category><![CDATA[Networking]]></category>
+		<category><![CDATA[GNU/Linux]]></category>
+		<category><![CDATA[iptables]]></category>
+		<category><![CDATA[sysadmin]]></category>
+		<guid isPermaLink="false">https://localhost/wordpress/?p=38</guid>
+
+					<description><![CDATA[Explicamos qué es iptables, cómo funciona y cómo configurar un sistema mediante iptables.]]></description>
+										<content:encoded><![CDATA[
+<h2 class="wp-block-heading" id="lo-primero-¿qué-es-iptables">Lo primero: ¿Qué es iptables?</h2>
+
+
+
+<p><code>iptables</code> es un programa <code>CLI</code> (Command Line Interface / Por interfaz de comandos) que hace de interfaz al programa <code>netfilter</code>, estos programas se encargan de configurar el cortafuegos del núcleo de sistemas GNU/Linux mediante <strong>reglas</strong>.</p>
+
+
+
+<ul>
+<li>Existen frontends gráficos para interactuar con <code>iptables</code>.</li>
+
+
+
+<li><code>iptables</code> se usa para IPv4 y <code>ip6tables</code> para IPv6.</li>
+
+
+
+<li>Podemos anidar tantas cadenas como queramos.</li>
+
+
+
+<li>Una regla puede ser simplemente un puntero a la cadena.</li>
+</ul>
+
+
+
+<p>Seguramente ahora mismo estarás pensando: ¿Para qué me voy a complicar la vida si tengo <code>firewalld</code> o <code>ufw</code>?
+Y entiendo tu inquietud, hay casos en los que realmente no prima usar <code>iptables</code> en sobre otro cortafuegos pero <code>iptables</code> es mucho más configurable que cualquiera de ellos, haciéndolo mucho más versátil y flexible a tus necesidades.</p>
+
+
+
+<h3 class="wp-block-heading" id="arquitectura-de-iptables">Arquitectura de iptables:</h3>
+
+
+
+<p><code>iptables</code> usa tablas para organizar sus reglas. Estas tablas clasifican reglas en base al tipo de decisiones que se van a tomar. Como ejemplo, si una regla filtra un tipo de paquetes en específico se pondrá en la tabla <code>filter</code>.
+En cada tabla las reglas se organizan en distintas <strong>cadenas</strong>. 
+Las cadenas permiten al administrador controlar donde en la entrega de un paquete se evaluará una regla.</p>
+
+
+
+<h4 class="wp-block-heading" id="cadenas">Cadenas</h4>
+
+
+
+<p>Hay 5 cadenas en <code>iptables</code> y cada una se encarga de una tarea en específico. Son responsables de los paquetes desde que llegan hasta que o se reenvían, descartan o procesan. Estas cadenas son:
+<code>PREROUTING</code>, <code>INPUT</code>, <code>FORWARD</code>, <code>OUTPUT</code>, <code>POSTROUTING</code>.</p>
+
+
+
+<h4 class="wp-block-heading" id="tablas">Tablas</h4>
+
+
+
+<p>Cada tabla se encarga de una cosa distinta. Hay otras 5 tablas: <code>filter</code>, <code>nat</code>, <code>mangle</code>, <code>raw</code> y <code>security</code>. Las dos primeras son las que más se usan. </p>
+
+
+
+<ul>
+<li><code>filter</code> es la más usada, se encarga de decidr si un paquete debe continuar su camino o perecer en el intento. </li>
+
+
+
+<li><code>nat</code> se usa para redireccionar paquetes de una máquina a otra (en resumen que podemos usar una máquina como router). </li>
+
+
+
+<li><code>mangle</code> puede ser usado para alterar la cabecera de un paquete IP de distintas maneras, se puede usar para cosas como por ejemplo ajustar el TTL (Time To Live) de un paquete. Otro tipo de cabeceras se pueden modificar de la misma manera.</li>
+
+
+
+<li><code>raw</code> se usa para configurar excepciones del seguimiento de conexiones. </li>
+
+
+
+<li><code>security</code> se usa para gestionar reglas especiales.</li>
+</ul>
+
+
+
+<figure class="wp-block-table aligncenter"><table><tbody><tr><td class="has-text-align-center" data-align="center"><strong>Tablas</strong></td><td><strong>PREROUTING</strong></td><td><strong>INPUT</strong></td><td><strong>FORWARD</strong></td><td><strong>OUTPUT</strong></td><td><strong>POSTROUTING</strong></td></tr><tr><td class="has-text-align-center" data-align="center">filter</td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td></tr><tr><td class="has-text-align-center" data-align="center">nat</td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td></tr><tr><td class="has-text-align-center" data-align="center">mangle</td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td></tr><tr><td class="has-text-align-center" data-align="center">raw</td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td></tr><tr><td class="has-text-align-center" data-align="center">security</td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/2705.png?resize=20%2C20&#038;ssl=1" alt="white_check_mark" width="20" height="20"  data-recalc-dims="1"></td><td><img decoding="async" src="https://i0.wp.com/github.githubassets.com/images/icons/emoji/unicode/274c.png?resize=20%2C20&#038;ssl=1" alt="x" width="20" height="20"  data-recalc-dims="1"></td></tr></tbody></table><figcaption class="wp-element-caption">Tabla ilustrativa del uso de las distintas cadenas</figcaption></figure>
+
+
+
+<p>El usuario puede crear sus propias <strong>cadenas</strong> dentro de cada <strong>tabla</strong> para organizar reglas. Las reglas se ejecutan de manera <strong>secuencial</strong> y tienen una <strong>jerarquía</strong>, la última es la que prevalece sobre la anterior, por lo que si en una deniego el acceso a por ejemplo un protocolo en específico y en la siguiente lo habilito será posible hacer uso de ese protocolo.</p>
+
+
+
+<h3 class="wp-block-heading">Parámetros comunes de iptables:</h3>
+
+
+
+<ul>
+<li><code>iptables -A</code>: Append, añadir una regla.</li>
+
+
+
+<li><code>iptables -D</code>: Borrar una regla.</li>
+
+
+
+<li><code>iptables -F</code>: Eliminta <strong>todas</strong> las reglas.</li>
+
+
+
+<li><code>iptables -P</code>: Modifica las políticas de una cadena.</li>
+
+
+
+<li><code>iptables -L</code>: Lista todas las reglas.</li>
+
+
+
+<li><code>iptables -N</code>: Crea una cadena de un usuario.</li>
+
+
+
+<li><code>iptables -R</code>: Reemplaza una regla.</li>
+
+
+
+<li><code>iptables -X</code>: Elimina una cadena definida por un usuario.</li>
+
+
+
+<li><code>iptables -t &lt;table&gt;</code>: Selecciona la tabla que se va a manipular.</li>
+</ul>
+
+
+
+<div class="wp-block-group is-layout-constrained">
+Ejercicio: Elimina las reglas en la tabla NAT:
+<details close="">
+<summary>Solución:</summary>
+    <code>
+        iptables -t nat -F
+    </code>
+</details>
+<br>
+</div>
+
+
+
+<p>Para ver una lista de todos los argumentos que se pueden usar en <code>iptables</code> recomiendo leer el sagrado <code>man iptables</code> para buscar en profundidad algún parámetro que te haga falta o <code>iptables --help</code> para una lista de los parámetros comunes del programa.</p>
+
+
+
+<h3 class="wp-block-heading"><a href="https://github.com/th3-m0th/blog.th3-m0th.github.io/blob/main/_posts/2023-01-27-IPTABLES.md#reglas" target="_blank" rel="noopener"></a></h3>
+
+
+
+<h3 class="wp-block-heading">Reglas</h3>
+
+
+
+<ul>
+<li><code>-i</code>: Interfaz de red por donde entrará el paquete. Solo se puede usar para <code>INPUT</code>, <code>FORWARD</code> y <code>PREROUTING</code>.</li>
+
+
+
+<li><code>-o</code>: Iterfaz de red por donde saldrá el paquete.</li>
+
+
+
+<li><code>-s 0.0.0.0/0</code>: Permite comparar los paquetes entrantes que vienen de una dirección. (En este caso cualquiera).</li>
+
+
+
+<li><code>-d</code>: Compara los paquetes salientes que llegan de la dirección de origen, la IP se puede sustituir por un hostname tanto en -s como en -d (Porque al fin y al cabo te lo va a resolver el DNS).</li>
+
+
+
+<li><code>-p</code>: Tipo de protocolo a usar que será comparado con la regla.</li>
+
+
+
+<li><code>-sport</code>: Puerto de origen. Se puede especificar un rango usando &#8216;:&#8217; ejemplo: 1090:65535</li>
+
+
+
+<li><code>-dport</code>: Puerto de destino.</li>
+
+
+
+<li><code>-m</code>: Se aplica la regla si se cumple una condición específica.</li>
+
+
+
+<li><code>-j</code>: Destino de la regla:</li>
+</ul>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><th>Destino</th><th>Información</th></tr></thead><tbody><tr><td>ACCEPT</td><td>Acepta la conexión</td></tr><tr><td>DROP</td><td>Deniega el acceso</td></tr><tr><td>QUEUE</td><td>Envía el paquete a las reglas del usuario</td></tr><tr><td>REJECT</td><td>Rechaza la conexión y envía el paquete a su origen</td></tr></tbody></table></figure>
+
+
+
+<ul>
+<li><code>LOG</code>: Todos los paquetes que coincidan por esta regla se guardan en un log.</li>
+
+
+
+<li><code>SNAT</code>: Un estado virtual donde difiere si la dirección fuente original difiere del envío destinado.</li>
+
+
+
+<li><code>DNAT</code>: Un estado virtual donde coincide si el destino difiere del lugar donde son reenviados.</li>
+</ul>
+
+
+
+<p></p>
+
+
+
+<h3 class="wp-block-heading" id="políticas">Políticas</h3>
+
+
+
+<p>En este apartado veremos algunos ejemplos sobre como aplicar políticas en <code>iptables</code>.</p>
+
+
+
+<ul>
+<li>Denegar el tráfico entrante:
+<code>iptables -P INPUT DROP</code></li>
+
+
+
+<li>Denegar el tráfico saliente:
+<code>iptables -P OUTPUT DROP</code></li>
+
+
+
+<li>Denegar el reenvío de paquetes: <code>iptables -P FORWARD DROP</code></li>
+</ul>
+
+
+
+<p>Eso sería todo, muchas gracias por leer, 
+<code>Happy Hacking!</code></p>
+
+
+
+<p><em>Si encuentras algún error o errata házmelo saber.</em></p>
+
+
+
+<p></p>
+
+
+
+<h2 class="wp-block-heading">¡Suscríbete a nuestra Newsletter!</h2>
+
+
+<div class="wp-block-jetpack-contact-form"><a href="./../../../iptables-para-novatos/index.html" target="_blank" rel="noopener noreferrer">Envía un formulario.</a></div>]]></content:encoded>
+					
+					<wfw:commentRss>./../../../iptables-para-novatos/feed/index.html</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">38</post-id>	</item>
+	</channel>
+</rss>

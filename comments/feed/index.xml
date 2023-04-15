@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	
+	xmlns:georss="http://www.georss.org/georss"
+	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	
+	>
+<channel>
+	<title>
+	Comentarios en th3-m0th	</title>
+	<atom:link href="./index.html" rel="self" type="application/rss+xml" />
+	<link>./../../index.html</link>
+	<description>Un blog sobre ciberseguridad y desarrollo de software.</description>
+	<lastBuildDate>Wed, 22 Feb 2023 12:19:58 +0000</lastBuildDate>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.2</generator>
+	<item>
+		<title>
+		Comentario en IPTABLES para novatos por th3-m0th		</title>
+		<link>./../../iptables-para-novatos/index.html#comment-5</link>
+
+		<dc:creator><![CDATA[th3-m0th]]></dc:creator>
+		<pubDate>Mon, 20 Feb 2023 10:46:25 +0000</pubDate>
+		<guid isPermaLink="false">https://localhost/wordpress/?p=38#comment-5</guid>
+
+					<description><![CDATA[En respuesta a &lt;a href=&quot;./../../iptables-para-novatos/index.html#comment-4&quot;&gt;YoZoiFrank&lt;/a&gt;.
+
+¡¡¡Me alegro de que te guste!!!]]></description>
+			<content:encoded><![CDATA[<p>En respuesta a <a href="./../../iptables-para-novatos/index.html#comment-4">YoZoiFrank</a>.</p>
+<p>¡¡¡Me alegro de que te guste!!!</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Comentario en IPTABLES para novatos por YoZoiFrank		</title>
+		<link>./../../iptables-para-novatos/index.html#comment-4</link>
+
+		<dc:creator><![CDATA[YoZoiFrank]]></dc:creator>
+		<pubDate>Sun, 19 Feb 2023 19:16:01 +0000</pubDate>
+		<guid isPermaLink="false">https://localhost/wordpress/?p=38#comment-4</guid>
+
+					<description><![CDATA[muy guapo tioooooo]]></description>
+			<content:encoded><![CDATA[<p>muy guapo tioooooo</p>
+]]></content:encoded>
+		
+			</item>
+	</channel>
+</rss>
